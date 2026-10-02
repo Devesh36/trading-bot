@@ -28,6 +28,8 @@ python -m pytest -q
 python scripts/chart_examples.py
 ```
 
+On macOS or Linux, `./bot.sh status` and `./bot.sh run` use the project virtual environment. On Apple Silicon Macs the launcher explicitly selects ARM64 Python, including when the terminal runs under Rosetta. Install dependencies with native ARM64 Python on these Macs. An `incompatible architecture (have 'arm64', need 'x86_64')` NumPy error means the Python process was launched in Intel mode; use this launcher with the existing ARM64 environment.
+
 To test your credentials without creating orders or changing trading state:
 
 ```bash
