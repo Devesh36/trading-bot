@@ -4,7 +4,7 @@ from logging.handlers import RotatingFileHandler
 import math
 from pathlib import Path
 import time
-import fcntl
+from process_lock import ProcessLock as ProcessLock  # Public compatibility import.
 import pandas as pd
 from exchange.delta_client import DeltaClient
 from data.market_data import history, normalize
@@ -17,26 +17,6 @@ from execution.order_manager import OrderManager
 from execution.position_manager import stop_hit
 from notifications.telegram import TelegramNotifier
 from ui.dashboard import render
-
-
-class ProcessLock:
-    def __init__(self, path):
-        self.path = path
-        self.file = None
-
-    def __enter__(self):
-        Path(self.path).parent.mkdir(parents=True, exist_ok=True)
-        self.file = open(self.path, "a+")
-        try:
-            fcntl.flock(self.file, fcntl.LOCK_EX | fcntl.LOCK_NB)
-        except BlockingIOError:
-            self.file.close()
-            raise RuntimeError("Another bot process holds this database lock") from None
-        return self
-
-    def __exit__(self, *args):
-        fcntl.flock(self.file, fcntl.LOCK_UN)
-        self.file.close()
 
 
 def setup_logging(config):

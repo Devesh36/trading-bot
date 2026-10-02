@@ -50,6 +50,44 @@ verify an actual entry/stop/exit lifecycle.
 
 ## Configuration
 
+### Windows 11 without WSL
+
+Install Python 3.12 for Windows, then open PowerShell in the cloned project folder:
+
+```powershell
+git pull --ff-only
+py -3.12 -m venv .venv
+.\.venv\Scripts\python.exe -m pip install -r requirements.txt
+if (!(Test-Path .env)) { Copy-Item .env.example .env }
+notepad .env
+```
+
+Create the virtual environment on Windows; do not copy a Mac/Linux `.venv`.
+No activation script or PowerShell execution-policy change is needed.
+The example defaults to local paper mode. For Delta demo trading set
+`TRADING_MODE=testnet`, keep `ENABLE_LIVE_TRADING=false`, and fill only
+`DELTA_TESTNET_API_KEY` and `DELTA_TESTNET_API_SECRET`. Add the Windows machine's
+public IP to the demo API whitelist if it differs.
+
+When moving an existing demo account from another computer, stop its bot first
+and privately copy its `.env` and `state` folder into this checkout after shutdown.
+Preserve the SQLite database and candle history; do not run two computers against
+the same account. The process lock coordinates only processes sharing one local
+lock file, not separate computers.
+
+Check demo credentials before starting demo trading:
+
+```powershell
+.\.venv\Scripts\python.exe scripts\check_exchange.py --mode testnet
+```
+
+After the checks pass, start the bot with `.\bot.cmd run`.
+Use `.\bot.cmd status` in another PowerShell window to view its latest
+saved status. Ctrl+C stops the foreground bot. Keep the computer awake and the
+terminal open; this does not install an automatic startup service. The launcher
+uses UTF-8 for output and the bot uses Windows file locking. Time-zone data is
+installed with the dependencies.
+
 Use `.env` (or `python main.py --env /path/to/env run`). Credentials are loaded only from that file and are never logged. Other configuration values can be overridden through process environment variables. See `.env.example` for every supported setting.
 
 - `TRADING_MODE=paper`: production public market data with simulated orders and a separate SQLite database. Private order endpoints are blocked at the HTTP boundary.
@@ -190,7 +228,7 @@ Set `TELEGRAM_BOT_TOKEN` and `TELEGRAM_CHAT_ID` in `.env` to enable startup/shut
 
 ## Continuous operation and troubleshooting
 
-Use Python 3.12+ on macOS/Linux; the process lock uses `fcntl`. Keep the machine awake, its clock synchronized, and networking reliable. Run in a terminal/tmux or a user-managed service. Stop with Ctrl-C. Shutdown does not close exchange positions or cancel protection. The bot never auto-deploys or automatically enables live mode.
+Use Python 3.12+ on Windows, macOS, or Linux; process locking uses `msvcrt` on Windows and `fcntl` on macOS/Linux. Keep the machine awake, its clock synchronized, and networking reliable. Run in a terminal or a user-managed service. Stop with Ctrl-C. Shutdown does not close exchange positions or cancel protection. The bot never auto-deploys or automatically enables live mode.
 
 - `AUTHENTICATION_FAILED`: check mode-specific keys, account/API permissions, IP allowlist, and clock synchronization. One authentication failure is enough to halt entries.
 - `STALE_MARKET_DATA`, `GAP_IN_CANDLES`, `HISTORY_INCOMPLETE`: resolve connectivity or missing data; missing candles are not fabricated. Check the cached history before resuming.
