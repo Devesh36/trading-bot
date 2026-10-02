@@ -53,7 +53,7 @@ Use `.env` (or `python main.py --env /path/to/env run`). Credentials are loaded 
 - `TRADING_MODE=paper`: production public market data with simulated orders and a separate SQLite database. Private order endpoints are blocked at the HTTP boundary.
 - `TRADING_MODE=testnet`: India demo market data and private APIs; requires `DELTA_TESTNET_API_KEY` and `DELTA_TESTNET_API_SECRET`. Production keys are never used in this mode.
 - `TRADING_MODE=live` **and** `ENABLE_LIVE_TRADING=true`: both are mandatory for production writes. Startup otherwise prints `LIVE TRADING DISABLED`. A live mode with the enable flag missing refuses startup.
-- `SYMBOLS=BTCUSD,ETHUSD`: exact exchange product symbols. Instrument IDs and contract sizes are discovered from the chosen environment, never copied between environments.
+- `SYMBOLS=BTCUSD,ETHUSD,ADAUSD,SOLUSD`: exact exchange product symbols. All four use the same strategy and share the portfolio risk limits (including at most two open positions). Instrument IDs and contract sizes are discovered from the chosen environment, never copied between environments. BNB is excluded because the India demo product catalog had no BNB contract when checked on 2026-10-02.
 - Strategy parameters are fixed to the request. Unsupported changes fail configuration validation.
 - Default leverage is 5, maximum 10. Any configuration above 10 is refused.
 - Initial simulated balance is `PAPER_EQUITY=10000` USD. Existing persisted balances are never reset by changing this setting.

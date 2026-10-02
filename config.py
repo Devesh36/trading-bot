@@ -15,7 +15,7 @@ class Config:
     delta_api_secret: str = field(default="", repr=False)
     delta_testnet_api_key: str = field(default="", repr=False)
     delta_testnet_api_secret: str = field(default="", repr=False)
-    symbols: str = "BTCUSD,ETHUSD"
+    symbols: str = "BTCUSD,ETHUSD,ADAUSD,SOLUSD"
     timeframe: str = "30m"
     supertrend_period: int = 13
     supertrend_multiplier: float = 4.0
